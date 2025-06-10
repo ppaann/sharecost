@@ -2,24 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { Low } from 'lowdb';
 import { JSONFile } from 'lowdb/node';
 import { v4 as uuidv4 } from 'uuid';
-
-type Player = {
-  id: string;
-  name: string;
-};
-
-type HistoryEntry = {
-  id: string;
-  type: 'game' | 'settlement';
-  participants?: string[];
-  paidBy?: { id: string; name: string };
-  [key: string]: unknown;
-};
-
-type Data = {
-  players: Player[];
-  history: HistoryEntry[];
-};
+import type { Data } from '@/types';
 
 const adapter = new JSONFile<Data>('db/db.json');
 const db = new Low<Data>(adapter, { players: [], history: [] });

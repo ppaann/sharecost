@@ -1,4 +1,5 @@
-// import { useState } from 'react';
+'use client';
+import { useState } from 'react';
 import PlayerCardList from '@/componets/playerCardList/PlayerCardList';
 import TabNavi from '@/componets/tabNavi/TabNavi/TabNavi';
 
@@ -26,10 +27,9 @@ const BadmintonIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function App() {
   const userId = '123'; // Example user ID
-  const activeTab = 'players'; // Example active tab
   // const [userId, setUserId] = useState<string | null>('sdf');
   // const [error, setError] = useState<string>('');
-  // const [activeTab, setActiveTab] = useState<'players' | 'history'>('players');
+  const [activeTab, setActiveTab] = useState<'players' | 'history'>('players');
   const playerBalances = [
     // Example player data
     { id: '1', name: 'Alice', balance: 10 },
@@ -71,7 +71,7 @@ export default function App() {
 
       <footer className='sticky bottom-0 bg-gray-900/80 backdrop-blur-sm p-4 mt-auto'>
         <div className='w-full max-w-4xl mx-auto flex justify-center items-center gap-4'>
-          <TabNavi />
+          <TabNavi activeTab={activeTab} setActiveTab={setActiveTab} />
           {/* <div className='flex items-center gap-2'>
             <button
               onClick={() => setAddPlayerModalOpen(true)}
