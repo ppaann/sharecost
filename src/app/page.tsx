@@ -2,6 +2,9 @@
 import { useState } from 'react';
 import PlayerCardList from '@/componets/playerCardList/PlayerCardList';
 import TabNavi from '@/componets/tabNavi/TabNavi/TabNavi';
+import { AddPlayerModal, useAddPlayerModal } from '@/componets/modals';
+
+import { Users } from 'lucide-react';
 
 // --- Custom SVG Icon for Badminton ---
 const BadmintonIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -30,6 +33,17 @@ export default function App() {
   // const [userId, setUserId] = useState<string | null>('sdf');
   // const [error, setError] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'players' | 'history'>('players');
+
+  // --- Modals State ---
+  // const [isAddPlayerModalOpen, setAddPlayerModalOpen] = useState(false);
+  // const [isAddGameModalOpen, setAddGameModalOpen] = useState(false);
+  // const [isHistoryDetailModalOpen, setHistoryDetailModalOpen] = useState(false);
+  // const [selectedHistoryItem, setSelectedHistoryItem] = useState<HistoryEntry | null>(null);
+  // const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
+  // const [confirmModalProps, setConfirmModalProps] = useState({ onConfirm: () => {}, title: '', message: '' });
+
+  const addPlayerModel = useAddPlayerModal();
+
   const playerBalances = [
     // Example player data
     { id: '1', name: 'Alice', balance: 10 },
@@ -72,7 +86,7 @@ export default function App() {
       <footer className='sticky bottom-0 bg-gray-900/80 backdrop-blur-sm p-4 mt-auto'>
         <div className='w-full max-w-4xl mx-auto flex justify-center items-center gap-4'>
           <TabNavi activeTab={activeTab} setActiveTab={setActiveTab} />
-          {/* <div className='flex items-center gap-2'>
+          <div className='flex items-center gap-2'>
             <button
               onClick={() => setAddPlayerModalOpen(true)}
               className='bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-4 rounded-full shadow-lg transition-transform transform hover:scale-105 flex items-center gap-2'
@@ -80,7 +94,7 @@ export default function App() {
               <Users size={20} />{' '}
               <span className='hidden sm:inline'>Add Player</span>
             </button>
-            <button
+            {/*  <button
               onClick={() => {
                 setPayerId('');
                 setParticipantIds([]);
@@ -91,10 +105,12 @@ export default function App() {
             >
               <Plus size={20} />{' '}
               <span className='hidden sm:inline'>New Game</span>
-            </button>
-          </div> */}
+            </button> */}
+          </div>
         </div>
       </footer>
+      {/* Modals */}
+      <AddPlayerModal {...addPlayerModel} />
     </div>
   );
 }
