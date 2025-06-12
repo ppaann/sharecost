@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import PlayerCardList from '@/componets/playerCardList/PlayerCardList';
 import TabNavi from '@/componets/tabNavi/TabNavi/TabNavi';
 import {
@@ -13,10 +13,13 @@ import { fetchPlayers } from '@/lib/redux/playersSlice';
 import { fetchHistory } from '@/lib/redux/historySlice';
 import { BadmintonIcon } from '@/componets/icons';
 import { Users, Plus } from 'lucide-react';
+import { Player, PlayerWithBalance } from '@/types';
+import { calculatePlayerBalances } from '@/lib/utils/calculatePlayerBalances';
 
 export default function App() {
   const dispatch = useAppDispatch();
   const players = useAppSelector((state) => state.players.entities);
+  const history = useAppSelector((state) => state.history.entries);
   const playerLoading = useAppSelector((state) => state.players.loading);
   const userId = '123'; // Example user ID
   const [activeTab, setActiveTab] = useState<'players' | 'history'>('players');
@@ -32,18 +35,15 @@ export default function App() {
   const addPlayerModel = useAddPlayerModal();
   const addGameModal = useAddGameModal();
 
-  const playerBalances = [
-    // Example player data
-    { id: '1', name: 'Alice', balance: 10 },
-    { id: '2', name: 'Bob', balance: -5 },
-    { id: '3', name: 'Charlie', balance: 0 },
-  ];
-
   // fetch initial data
   useEffect(() => {
     dispatch(fetchPlayers());
     dispatch(fetchHistory());
   }, [dispatch]);
+
+  const playerBalances = useMemo<PlayerWithBalance[]>(() => {
+    return calculatePlayerBalances(players, history);
+  }, [players, history]);
 
   if (playerLoading === 'pending') {
     return (

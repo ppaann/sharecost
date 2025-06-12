@@ -1,5 +1,3 @@
-import { Player } from './';
-
 export interface HistoryEntry {
   id: string;
   type: 'game' | 'settlement';
@@ -9,24 +7,6 @@ export interface HistoryEntry {
   date?: string; // ISO date string
   amount?: number;
   [key: string]: unknown; // Additional fields for flexibility
-}
-
-export interface PlayerWithBalance extends Player {
-  balance: number;
-}
-
-// For creating new games
-export interface GameData {
-  type: 'game';
-  cost: number;
-  paidBy: { id: string; name: string };
-  participants: string[];
-  participantNames: string[];
-}
-
-// For settling up
-export interface SettlementData {
-  playerId: string;
-  playerName: string;
-  amount: number;
+  playerId?: string;
+  playerName?: string;
 }

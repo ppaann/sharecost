@@ -1,5 +1,8 @@
-export type Player = {
+export interface Player {
   id: string;
   name: string;
-  balance?: number;
-};
+}
+
+export interface PlayerWithBalance extends Player {
+  balance: number;
+}
