@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# example files
+src/app/page.tsx.prev
+
+# database
+db/db.json
