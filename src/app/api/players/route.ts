@@ -25,10 +25,20 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
+  if (db.data.players.some((p) => p.name === name)) {
+    return new Response(
+      JSON.stringify({ message: 'Player with this name already exists' }),
+      { status: 409 }
+    );
+  }
+
   const newPlayer = { id: uuidv4(), name };
   db.data.players.push(newPlayer);
   await db.write();
-  return Response.json(newPlayer, { status: 201 });
+  return new Response(JSON.stringify(newPlayer), {
+    status: 201,
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
 
 export async function DELETE(req: Request) {

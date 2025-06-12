@@ -1,8 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PlayerCardList from '@/componets/playerCardList/PlayerCardList';
 import TabNavi from '@/componets/tabNavi/TabNavi/TabNavi';
 import { AddPlayerModal, useAddPlayerModal } from '@/componets/modals';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/store';
+import { addPlayer, fetchPlayers } from '@/lib/redux/playersSlice';
 
 import { Users } from 'lucide-react';
 
@@ -29,6 +31,8 @@ const BadmintonIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export default function App() {
+  const dispatch = useAppDispatch();
+  const players = useAppSelector((state) => state.players.entities);
   const userId = '123'; // Example user ID
   // const [userId, setUserId] = useState<string | null>('sdf');
   // const [error, setError] = useState<string>('');
@@ -50,6 +54,11 @@ export default function App() {
     { id: '2', name: 'Bob', balance: -5 },
     { id: '3', name: 'Charlie', balance: 0 },
   ];
+
+  // fetch initial data
+  useEffect(() => {
+    dispatch(fetchPlayers());
+  }, [dispatch]);
 
   return (
     <div className='bg-gray-900 text-white min-h-screen font-sans flex flex-col'>
@@ -74,7 +83,16 @@ export default function App() {
 
         <div className='w-full max-w-4xl mx-auto'>
           {activeTab === 'players' && (
-            <PlayerCardList playerBalances={playerBalances} />
+            <>
+              <div>
+                {players && players.length > 0 ? (
+                  players.map((p) => <div key={p.id}>{p.name}</div>)
+                ) : (
+                  <div>No Player</div>
+                )}
+              </div>
+              <PlayerCardList playerBalances={playerBalances} />
+            </>
           )}
           {activeTab === 'history' && (
             <div>historyList</div>

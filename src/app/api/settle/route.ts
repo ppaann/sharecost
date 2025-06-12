@@ -24,6 +24,45 @@ type Data = {
 const adapter = new JSONFile<Data>('db/db.json');
 const db = new Low<Data>(adapter, { players: [], history: [] });
 
+export async function POST(req: Request) {
+  await db.read();
+  db.data ||= { players: [], history: [] };
+
+  const { playerId, playerName, amount } = await req.json();
+
+  if (!playerId || !playerName || amount === undefined) {
+    return new Response(
+      JSON.stringify({ message: 'Missing required fields for settlement.' }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+  try {
+    const newSettlement: HistoryEntry = {
+      id: uuidv4(),
+      type: 'settlement',
+      playerId,
+      playerName,
+      amount,
+      date: new Date().toISOString(),
+    };
+
+    db.data.history.push(newSettlement);
+    await db.write();
+
+    return new Response(JSON.stringify(newSettlement), {
+      status: 201,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error('Failed to record settlement:', error);
+    return new Response(JSON.stringify({ message: 'Internal Server Error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
