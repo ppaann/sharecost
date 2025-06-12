@@ -54,7 +54,7 @@ const useAddPlayerModal = (): ControllerProps => {
 
   return {
     isOpen: modal.isOpen,
-    onOpen: modal.open,
+    onOpen: modal.onOpen,
     onClose: modal.onClose,
     onAdd,
     name,
