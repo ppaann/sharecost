@@ -5,7 +5,7 @@ export type usePlayerCardProps = {
 };
 
 const usePlayerCard = ({ player }: usePlayerCardProps) => {
-  const balance = player.balance || 0;
+  const balance = player.balance ? player.balance : 0;
   const isOwed = balance < 0;
   const isCreditor = balance > 0;
   const balanceHighlight = Math.abs(balance) >= 50 && isOwed;

@@ -11,8 +11,10 @@ type PlayerBalances = {
 
 const PlayerCardList = ({
   playerBalances,
+  onRequestSettle,
 }: {
   playerBalances: PlayerBalances;
+  onRequestSettle: (playerId: string) => void;
 }) => {
   return (
     <div>
@@ -23,7 +25,7 @@ const PlayerCardList = ({
             <PlayerCard
               key={player.id}
               player={player}
-              onSettle={() => {}}
+              onSettle={onRequestSettle}
               onDelete={() => {}}
             />
           ))}

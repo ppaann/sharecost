@@ -15,7 +15,7 @@ export const addPlayer = createAsyncThunk(
     const response = await fetch('/api/players', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ name, balance: 0 }),
     });
     return response.json();
   }

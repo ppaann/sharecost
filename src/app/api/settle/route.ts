@@ -1,4 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
 import { Low } from 'lowdb';
 import { JSONFile } from 'lowdb/node';
 import { v4 as uuidv4 } from 'uuid';
@@ -60,45 +59,5 @@ export async function POST(req: Request) {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
-  }
-}
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-
-  await db.read();
-  db.data ||= { players: [], history: [] };
-
-  const { playerId, playerName, amount } = req.body;
-
-  if (!playerId || !playerName || amount === undefined) {
-    return res
-      .status(400)
-      .json({ message: 'Missing required fields for settlement.' });
-  }
-
-  try {
-    const newSettlement: HistoryEntry = {
-      id: uuidv4(),
-      type: 'settlement',
-      playerId,
-      playerName,
-      amount,
-      date: new Date().toISOString(),
-    };
-
-    db.data.history.push(newSettlement);
-    await db.write();
-
-    res.status(201).json(newSettlement);
-  } catch (error) {
-    console.error('Failed to record settlement:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
   }
 }

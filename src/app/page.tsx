@@ -7,14 +7,17 @@ import {
   useAddPlayerModal,
   AddGameModal,
   useAddGameModal,
+  useConfirmationModal,
+  ConfirmationModal,
 } from '@/componets/modals';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/store';
 import { fetchPlayers } from '@/lib/redux/playersSlice';
 import { fetchHistory } from '@/lib/redux/historySlice';
 import { BadmintonIcon } from '@/componets/icons';
 import { Users, Plus } from 'lucide-react';
-import { Player, PlayerWithBalance } from '@/types';
+import { Player } from '@/types';
 import { calculatePlayerBalances } from '@/lib/utils/calculatePlayerBalances';
+import { useSettleBalance } from '@/hooks';
 
 export default function App() {
   const dispatch = useAppDispatch();
@@ -34,6 +37,9 @@ export default function App() {
 
   const addPlayerModel = useAddPlayerModal();
   const addGameModal = useAddGameModal();
+  const confirmSettleModal = useConfirmationModal();
+
+  const settleBalance = useSettleBalance();
 
   // fetch initial data
   useEffect(() => {
@@ -41,7 +47,18 @@ export default function App() {
     dispatch(fetchHistory());
   }, [dispatch]);
 
-  const playerBalances = useMemo<PlayerWithBalance[]>(() => {
+  const handleSettleBalance = (playerId: string) => {
+    confirmSettleModal.open({
+      title: 'Settle Balance',
+      message: `Are you sure you want to settle the balance ?`,
+      onConfirm: () => {
+        settleBalance(playerId);
+        confirmSettleModal.close();
+      },
+    });
+  };
+
+  const playerBalances = useMemo<Player[]>(() => {
     return calculatePlayerBalances(players, history);
   }, [players, history]);
 
@@ -96,7 +113,10 @@ export default function App() {
                 </div>
               )}
 
-              <PlayerCardList playerBalances={playerBalances} />
+              <PlayerCardList
+                playerBalances={playerBalances}
+                onRequestSettle={handleSettleBalance}
+              />
             </div>
           )}
           {activeTab === 'history' && (
@@ -130,6 +150,7 @@ export default function App() {
       {/* Modals */}
       <AddPlayerModal {...addPlayerModel} />
       <AddGameModal {...addGameModal} />
+      <ConfirmationModal />
     </div>
   );
 }
