@@ -10,15 +10,12 @@ type ConfirmationModalProps = {
 const useConfirmationModal = () => {
   const modal = useModal<ConfirmationModalProps>();
   const confirmRef = useRef<() => void>(() => {});
-  const [props, setProps] = useState<Omit<
-    ConfirmationModalProps,
-    'onConfirm'
-  > | null>(null);
+  const [props, setProps] = useState<ConfirmationModalProps | null>(null);
 
   const open = useCallback(
     ({ title, message, onConfirm }: ConfirmationModalProps) => {
       confirmRef.current = onConfirm;
-      setProps({ title, message });
+      setProps({ title, message, onConfirm });
       modal.onOpen();
     },
     [modal]

@@ -39,7 +39,7 @@ export default function App() {
   const addGameModal = useAddGameModal();
   const confirmSettleModal = useConfirmationModal();
 
-  const settleBalance = useSettleBalance();
+  const { settleBalance } = useSettleBalance();
 
   // fetch initial data
   useEffect(() => {
@@ -47,21 +47,20 @@ export default function App() {
     dispatch(fetchHistory());
   }, [dispatch]);
 
+  const playerBalances = useMemo<Player[]>(() => {
+    return calculatePlayerBalances(players, history);
+  }, [players, history]);
+
   const handleSettleBalance = (playerId: string) => {
     confirmSettleModal.open({
       title: 'Settle Balance',
       message: `Are you sure you want to settle the balance ?`,
       onConfirm: () => {
-        settleBalance(playerId);
+        settleBalance(playerBalances, playerId);
         confirmSettleModal.close();
       },
     });
   };
-
-  const playerBalances = useMemo<Player[]>(() => {
-    return calculatePlayerBalances(players, history);
-  }, [players, history]);
-
   if (playerLoading === 'pending') {
     return (
       <div className='flex items-center justify-center h-screen bg-gray-900 text-white'>
@@ -150,7 +149,13 @@ export default function App() {
       {/* Modals */}
       <AddPlayerModal {...addPlayerModel} />
       <AddGameModal {...addGameModal} />
-      <ConfirmationModal />
+      <ConfirmationModal
+        isOpen={confirmSettleModal.isOpen}
+        onClose={confirmSettleModal.close}
+        handleConfirm={confirmSettleModal.handleConfirm || (() => {})}
+        title={confirmSettleModal.props?.title || ''}
+        message={confirmSettleModal.props?.message || ''}
+      />
     </div>
   );
 }
