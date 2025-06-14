@@ -1,4 +1,4 @@
-import { Player, HistoryEntry } from '@/types';
+import { Player, PlayerWithBalance, HistoryEntry } from '@/types';
 
 /**
  * Function to calculate player balances based on game history.
@@ -10,11 +10,17 @@ import { Player, HistoryEntry } from '@/types';
 export function calculatePlayerBalances(
   players: Player[],
   history: HistoryEntry[]
-) {
-  const balances: { [key: string]: Player } = players.reduce((acc, player) => {
-    acc[player.id] = { ...player, balance: 0 };
-    return acc;
-  }, {} as { [key: string]: Player });
+): PlayerWithBalance[] {
+  const balances: { [key: string]: PlayerWithBalance } = players.reduce(
+    (acc, player) => {
+      acc[player.id] = { ...player, balance: 0 };
+      return acc;
+    },
+    {} as { [key: string]: PlayerWithBalance }
+  );
+
+  console.log('Calculating balances for players:', balances);
+  console.log('Using history entries:', history);
 
   history.forEach((entry) => {
     if (entry.type === 'game' && entry.participants && entry.paidBy) {

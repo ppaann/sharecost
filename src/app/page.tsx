@@ -15,7 +15,7 @@ import { fetchPlayers } from '@/lib/redux/playersSlice';
 import { fetchHistory } from '@/lib/redux/historySlice';
 import { BadmintonIcon } from '@/componets/icons';
 import { Users, Plus } from 'lucide-react';
-import { Player } from '@/types';
+import { PlayerWithBalance } from '@/types';
 import { calculatePlayerBalances } from '@/lib/utils/calculatePlayerBalances';
 import { useSettleBalance } from '@/hooks';
 
@@ -28,12 +28,8 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'players' | 'history'>('players');
 
   // --- Modals State ---
-  // const [isAddPlayerModalOpen, setAddPlayerModalOpen] = useState(false);
-  // const [isAddGameModalOpen, setAddGameModalOpen] = useState(false);
   // const [isHistoryDetailModalOpen, setHistoryDetailModalOpen] = useState(false);
   // const [selectedHistoryItem, setSelectedHistoryItem] = useState<HistoryEntry | null>(null);
-  // const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
-  // const [confirmModalProps, setConfirmModalProps] = useState({ onConfirm: () => {}, title: '', message: '' });
 
   const addPlayerModel = useAddPlayerModal();
   const addGameModal = useAddGameModal();
@@ -47,7 +43,7 @@ export default function App() {
     dispatch(fetchHistory());
   }, [dispatch]);
 
-  const playerBalances = useMemo<Player[]>(() => {
+  const playerBalances = useMemo<PlayerWithBalance[]>(() => {
     return calculatePlayerBalances(players, history);
   }, [players, history]);
 

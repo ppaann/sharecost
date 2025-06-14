@@ -2,18 +2,13 @@
 import React from 'react';
 import PlayerCard from '@/componets/playerCard/PlayerCard';
 import { Users } from 'lucide-react';
-
-type PlayerBalances = {
-  id: string;
-  name: string;
-  balance: number;
-}[];
+import { PlayerWithBalance } from '@/types';
 
 const PlayerCardList = ({
   playerBalances,
   onRequestSettle,
 }: {
-  playerBalances: PlayerBalances;
+  playerBalances: PlayerWithBalance[];
   onRequestSettle: (playerId: string) => void;
 }) => {
   return (
