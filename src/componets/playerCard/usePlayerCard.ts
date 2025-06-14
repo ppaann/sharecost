@@ -4,8 +4,13 @@ export type usePlayerCardProps = {
   player: Player;
 };
 
+const EPSILON = 1e-5; // or another small value
+
 const usePlayerCard = ({ player }: usePlayerCardProps) => {
-  const balance = player.balance ? player.balance : 0;
+  let balance = player.balance ? player.balance : 0;
+  if (Math.abs(balance) < EPSILON) {
+    balance = 0;
+  }
   const isOwed = balance < 0;
   const isCreditor = balance > 0;
   const balanceHighlight = Math.abs(balance) >= 50 && isOwed;

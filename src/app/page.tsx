@@ -39,7 +39,7 @@ export default function App() {
   const addGameModal = useAddGameModal();
   const confirmSettleModal = useConfirmationModal();
 
-  const { settleBalance } = useSettleBalance();
+  const settleBalance = useSettleBalance();
 
   // fetch initial data
   useEffect(() => {

@@ -1,10 +1,11 @@
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '@/lib/redux/store';
 import { Player, SettlementData } from '@/types';
+import { settleBalance } from '@/lib/redux/historySlice'; // Import the action to settle balance
 
 const useSettleBalance = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const settleBalance = (playerBalances: Player[], playerId: string) => {
+  const handleSettleBalance = (playerBalances: Player[], playerId: string) => {
     const player = playerBalances.find((p) => p.id === playerId);
     if (!player || player.balance >= 0) return;
     const settlementData: SettlementData = {
@@ -14,10 +15,18 @@ const useSettleBalance = () => {
       type: 'settlement',
     };
 
-    dispatch({ type: 'settleBalance', payload: settlementData });
+    dispatch(settleBalance(settlementData))
+      .unwrap()
+      .catch((error: unknown) => {
+        if (error instanceof Error) {
+          console.error('Failed to settle balance:', error.message);
+        } else {
+          console.error('Failed to settle balance:', error);
+        }
+      });
   };
 
-  return { settleBalance };
+  return handleSettleBalance;
 };
 
 export default useSettleBalance;
