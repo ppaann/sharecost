@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import PlayerCardList from '@/componets/playerCardList/PlayerCardList';
+import HistoryList from '@/componets/historyList/HistoryList';
 import TabNavi from '@/componets/tabNavi/TabNavi/TabNavi';
 import {
   AddPlayerModal,
@@ -9,22 +10,26 @@ import {
   useAddGameModal,
   useConfirmationModal,
   ConfirmationModal,
+  HistoryDetailModal,
+  useHistoryDetailModal,
 } from '@/componets/modals';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/store';
 import { fetchPlayers } from '@/lib/redux/playersSlice';
 import { fetchHistory } from '@/lib/redux/historySlice';
 import { BadmintonIcon } from '@/componets/icons';
 import { Users, Plus } from 'lucide-react';
-import { PlayerWithBalance } from '@/types';
+import { HistoryEntry, PlayerWithBalance } from '@/types';
 import { calculatePlayerBalances } from '@/lib/utils/calculatePlayerBalances';
 import { useSettleBalance } from '@/hooks';
 
 export default function App() {
   const dispatch = useAppDispatch();
+  const userId = '123'; // Example user ID
+
   const players = useAppSelector((state) => state.players.entities);
   const history = useAppSelector((state) => state.history.entries);
   const playerLoading = useAppSelector((state) => state.players.loading);
-  const userId = '123'; // Example user ID
+
   const [activeTab, setActiveTab] = useState<'players' | 'history'>('players');
 
   // --- Modals State ---
@@ -34,6 +39,7 @@ export default function App() {
   const addPlayerModel = useAddPlayerModal();
   const addGameModal = useAddGameModal();
   const confirmSettleModal = useConfirmationModal();
+  const historyDetailModal = useHistoryDetailModal();
 
   const settleBalance = useSettleBalance();
 
@@ -57,6 +63,11 @@ export default function App() {
       },
     });
   };
+
+  const handleHistoryItemClick = (item: HistoryEntry) => {
+    historyDetailModal.open({ item });
+  };
+
   if (playerLoading === 'pending') {
     return (
       <div className='flex items-center justify-center h-screen bg-gray-900 text-white'>
@@ -115,8 +126,7 @@ export default function App() {
             </div>
           )}
           {activeTab === 'history' && (
-            <div>historyList</div>
-            // <HistoryList history={history} onSelect={openHistoryDetail} />
+            <HistoryList history={history} onSelect={handleHistoryItemClick} />
           )}
         </div>
       </main>
@@ -151,6 +161,11 @@ export default function App() {
         handleConfirm={confirmSettleModal.handleConfirm || (() => {})}
         title={confirmSettleModal.props?.title || ''}
         message={confirmSettleModal.props?.message || ''}
+      />
+      <HistoryDetailModal
+        isOpen={historyDetailModal.isOpen}
+        onClose={historyDetailModal.onClose}
+        item={historyDetailModal.props?.item || null}
       />
     </div>
   );

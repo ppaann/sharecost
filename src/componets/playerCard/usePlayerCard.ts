@@ -1,7 +1,7 @@
-import { Player } from '@/types/player';
+import { PlayerWithBalance } from '@/types/player';
 
 export type usePlayerCardProps = {
-  player: Player;
+  player: PlayerWithBalance;
 };
 
 const EPSILON = 1e-5; // or another small value

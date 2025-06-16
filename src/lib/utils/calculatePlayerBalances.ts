@@ -19,8 +19,8 @@ export function calculatePlayerBalances(
     {} as { [key: string]: PlayerWithBalance }
   );
 
-  console.log('Calculating balances for players:', balances);
-  console.log('Using history entries:', history);
+  // console.log('Calculating balances for players:', balances);
+  // console.log('Using history entries:', history);
 
   history.forEach((entry) => {
     if (entry.type === 'game' && entry.participants && entry.paidBy) {
