@@ -41,7 +41,7 @@ const HistoryDetailModal = ({
           </p>
         ) : (
           <p>
-            <strong>Paid By:</strong> {item.playerName || 'Unknown'}
+            <strong>Paid By:</strong> {item.settledPlayerName || 'Unknown'}
           </p>
         )}
         {item.type === 'game' && (item.participants?.length ?? 0) > 0 && (

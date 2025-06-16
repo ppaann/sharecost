@@ -18,7 +18,7 @@ export async function GET() {
 export async function POST(req: Request) {
   await db.read();
   db.data ||= { players: [], history: [] };
-  const { name } = await req.json();
+  const { name, isMe } = await req.json();
   if (!name) {
     return new Response(
       JSON.stringify({ message: 'Player name is required' }),
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const newPlayer = { id: uuidv4(), name };
+  const newPlayer = { id: uuidv4(), name, isMe: !!isMe };
   db.data.players.push(newPlayer);
   await db.write();
   return new Response(JSON.stringify(newPlayer), {

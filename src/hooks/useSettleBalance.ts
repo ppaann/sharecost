@@ -12,8 +12,8 @@ const useSettleBalance = () => {
     const player = playerBalances.find((p) => p.id === playerId);
     if (!player || player.balance >= 0) return;
     const settlementData: SettlementData = {
-      playerId: player.id,
-      playerName: player.name,
+      settledPlayerId: player.id,
+      settledPlayerName: player.name,
       amount: -player.balance,
       type: 'settlement',
     };

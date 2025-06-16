@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { HistoryEntry, GameData, SettlementData } from '@/types';
+import { HistoryEntry, GameData, SettlementData, Player } from '@/types';
 
 export const fetchHistory = createAsyncThunk(
   'history/fetchHistory',
@@ -23,11 +23,17 @@ export const addGame = createAsyncThunk(
 
 export const settleBalance = createAsyncThunk(
   'history/settleBalance',
-  async (settlementData: SettlementData) => {
+  async (settlementData: SettlementData, { getState }) => {
+    const { players } = (getState() as { players: { players: Player[] } })
+      .players;
+    const me = players.find((p) => p.isMe);
+    if (!me) {
+      throw new Error('Current user not found in players list');
+    }
     const response = await fetch('/api/settle', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(settlementData),
+      body: JSON.stringify({ ...settlementData, settledById: me.id }),
     });
     return response.json();
   }

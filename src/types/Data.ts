@@ -18,7 +18,7 @@ export interface GameData {
 // For settling up
 export interface SettlementData {
   type: 'settlement';
-  playerId: string;
-  playerName: string;
+  settledPlayerId: string;
+  settledPlayerName: string;
   amount: number;
 }
