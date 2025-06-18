@@ -53,8 +53,8 @@ export default function App() {
   const playerBalances = useMemo<PlayerWithBalance[]>(() => {
     if (!me) return [];
 
-    return calculatePlayerBalances(players, friends, history, me);
-  }, [players, friends, history, me]);
+    return calculatePlayerBalances(friends, history, me);
+  }, [friends, history, me]);
 
   const handleSettleBalance = (playerId: string) => {
     confirmSettleModal.open({
