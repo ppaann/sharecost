@@ -8,15 +8,16 @@ import { Player, PlayerWithBalance, HistoryEntry } from '@/types';
  * @returns Array of players with updated balances.
  */
 export function calculatePlayerBalances(
-  players: Player[],
-  history: HistoryEntry[]
+  friends: Player[],
+  history: HistoryEntry[],
+  me: Player
 ): PlayerWithBalance[] {
-  const balances: { [key: string]: PlayerWithBalance } = players.reduce(
-    (acc, player) => {
-      acc[player.id] = { ...player, balance: 0 };
+  const balances: { [key: string]: PlayerWithBalance } = friends.reduce(
+    (acc, friend) => {
+      acc[friend.id] = { ...friend, balance: 0 };
       return acc;
     },
-    {} as { [key: string]: PlayerWithBalance }
+    {} as Record<string, PlayerWithBalance>
   );
 
   // console.log('Calculating balances for players:', balances);
@@ -25,16 +26,32 @@ export function calculatePlayerBalances(
   history.forEach((entry) => {
     if (entry.type === 'game' && entry.participants && entry.paidBy) {
       const cost = entry.cost || 0;
+      const iPaid = entry.paidBy.id === me.id;
+      const payerId = entry.paidBy.id;
       const numParticipants = entry.participants.length;
       if (numParticipants === 0) return;
       const share = cost / numParticipants;
-      entry.participants.forEach((pId) => {
-        if (balances[pId]) balances[pId].balance -= share;
-      });
-      if (balances[entry.paidBy.id]) balances[entry.paidBy.id].balance += cost;
-    } else if (entry.type === 'settlement' && entry.playerId) {
-      if (balances[entry.playerId])
-        balances[entry.playerId].balance += entry.amount || 0;
+
+      balances[payerId].balance += cost - share;
+      if (iPaid) {
+        entry.participants.forEach((pId) => {
+          if (pId !== me.id && balances[pId]) {
+            balances[pId].balance -= share;
+          }
+        });
+      } else {
+        entry.participants.forEach((pId) => {
+          if (pId !== payerId) {
+            balances[pId].balance -= share;
+          }
+        });
+      }
+    } else if (entry.type === 'settlement' && entry.settledPlayerId) {
+      if (balances[entry.settledPlayerId]) {
+        const amount = balances[entry.settledPlayerId].balance;
+        balances[me.id].balance -= amount;
+        balances[entry.settledPlayerId].balance = 0;
+      }
     }
   });
   return Object.values(balances);

@@ -30,11 +30,12 @@ export default function App() {
   const history = useAppSelector((state) => state.history.entries);
   const playerLoading = useAppSelector((state) => state.players.loading);
 
+  const me = useMemo(() => players.find((p) => p.isMe), [players]);
+  const friends = useMemo(() => players.filter((p) => !p.isMe), [players]);
+
   const [activeTab, setActiveTab] = useState<'players' | 'history'>('players');
 
   // --- Modals State ---
-  // const [isHistoryDetailModalOpen, setHistoryDetailModalOpen] = useState(false);
-  // const [selectedHistoryItem, setSelectedHistoryItem] = useState<HistoryEntry | null>(null);
 
   const addPlayerModel = useAddPlayerModal();
   const addGameModal = useAddGameModal();
@@ -50,8 +51,10 @@ export default function App() {
   }, [dispatch]);
 
   const playerBalances = useMemo<PlayerWithBalance[]>(() => {
-    return calculatePlayerBalances(players, history);
-  }, [players, history]);
+    if (!me) return [];
+
+    return calculatePlayerBalances(players, friends, history, me);
+  }, [players, friends, history, me]);
 
   const handleSettleBalance = (playerId: string) => {
     confirmSettleModal.open({
