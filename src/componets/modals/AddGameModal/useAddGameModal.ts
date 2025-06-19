@@ -20,10 +20,11 @@ const useAddGameModal = () => {
   const modal = useModal<ControllerProps>();
   const players = useAppSelector((state) => state.players.entities);
   const [error, setError] = useState<string | null>(null);
+  const me = players.find((p) => p.isMe);
 
   // form input
   const [participantIds, setParticipantIds] = useState<string[]>([]);
-  const [payerId, setPayerId] = useState<string>('');
+  const [payerId, setPayerId] = useState<string>(me?.id || '');
   const [cost, setCost] = useState<string>('');
 
   const toggleParticipant = (id: string) => {
@@ -35,7 +36,7 @@ const useAddGameModal = () => {
   const onOpen = () => {
     setError(null);
     setCost('');
-    setPayerId('');
+    setPayerId(me?.id || '');
     setParticipantIds([]);
     modal.onOpen();
   };

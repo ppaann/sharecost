@@ -47,7 +47,7 @@ const HistoryList = ({
             <p className='text-sm text-gray-300'>
               {item.type === 'game'
                 ? `Paid by ${item.paidBy?.name}`
-                : `Paid by ${item.playerName}`}
+                : `Paid by ${item.settledPlayerName}`}
             </p>
           </div>
         </div>

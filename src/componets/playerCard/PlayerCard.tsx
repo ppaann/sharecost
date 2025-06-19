@@ -3,10 +3,10 @@
 import React from 'react';
 import { Trash2 } from 'lucide-react';
 import usePlayerCard from './usePlayerCard';
-import { Player } from '@/types/player';
+import { PlayerWithBalance } from '@/types/player';
 
 type PlayerCardProps = {
-  player: Player;
+  player: PlayerWithBalance;
   onDelete: (id: string) => void;
   onSettle: (id: string) => void;
 };
