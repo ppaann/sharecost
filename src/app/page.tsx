@@ -19,7 +19,10 @@ import { fetchHistory } from '@/lib/redux/historySlice';
 import { BadmintonIcon } from '@/componets/icons';
 import { Users, Plus } from 'lucide-react';
 import { HistoryEntry, PlayerWithBalance } from '@/types';
-import { calculatePlayerBalances } from '@/lib/utils/calculatePlayerBalances';
+import {
+  calculatePlayerBalances,
+  calculateMyBalances,
+} from '@/lib/utils/calculatePlayerBalances';
 import { useSettleBalance } from '@/hooks';
 
 export default function App() {
@@ -51,18 +54,11 @@ export default function App() {
 
   const friendBalances = useMemo<PlayerWithBalance[]>(() => {
     if (!me) return [];
-
     return calculatePlayerBalances(friends, history, me);
   }, [friends, history, me]);
 
   const { whoOwesMe, iOwe, myTotalBalance } = useMemo(() => {
-    const whoOwesMe = friendBalances.filter((f) => f.balance < -0.01); // Use threshold for float issues
-    const iOwe = friendBalances.filter((f) => f.balance > 0.01);
-    const myTotalBalance = friendBalances.reduce(
-      (sum, f) => sum - f.balance,
-      0
-    );
-    return { whoOwesMe, iOwe, myTotalBalance };
+    return calculateMyBalances(friendBalances);
   }, [friendBalances]);
 
   const handleSettleBalance = (playerId: string) => {
@@ -152,7 +148,10 @@ export default function App() {
                 <div>
                   <h3 className='text-xl font-bold mb-4'>Who Owes Me</h3>
                   <div className='space-y-3'>
-                    <PlayerCardList playerBalances={whoOwesMe} />
+                    <PlayerCardList
+                      playerBalances={whoOwesMe}
+                      onRequestSettle={handleSettleBalance}
+                    />
                     {whoOwesMe.length === 0 && (
                       <p className='text-gray-500 text-sm'>
                         No one owes you money.
@@ -163,10 +162,7 @@ export default function App() {
                 <div>
                   <h3 className='text-xl font-bold mb-4'>Who I Owe</h3>
                   <div className='space-y-3'>
-                    <PlayerCardList
-                      playerBalances={iOwe}
-                      onRequestSettle={handleSettleBalance}
-                    />
+                    <PlayerCardList playerBalances={iOwe} />
                     {iOwe.length === 0 && (
                       <p className='text-gray-500 text-sm'>
                         You don&rdquo;t owe anyone money.

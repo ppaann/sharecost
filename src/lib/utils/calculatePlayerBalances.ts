@@ -37,16 +37,27 @@ export function calculatePlayerBalances(
         });
       } else {
         entry.participants.forEach((pId) => {
-          if (pId !== payerId) {
+          if (pId !== me.id && pId !== payerId) {
             balances[pId].balance -= share;
           }
         });
       }
     } else if (entry.type === 'settlement' && entry.settledPlayerId) {
-      if (balances[entry.settledPlayerId]) {
-        balances[entry.settledPlayerId].balance = 0;
+      if (balances[entry.settledPlayerId] && entry.amount) {
+        balances[entry.settledPlayerId].balance += entry.amount;
       }
     }
   });
   return Object.values(balances);
+}
+
+export function calculateMyBalances(friendBalances: PlayerWithBalance[]): {
+  whoOwesMe: PlayerWithBalance[];
+  iOwe: PlayerWithBalance[];
+  myTotalBalance: number;
+} {
+  const whoOwesMe = friendBalances.filter((f) => f.balance < -0.01); // Use threshold for float issues
+  const iOwe = friendBalances.filter((f) => f.balance > 0.01);
+  const myTotalBalance = friendBalances.reduce((sum, f) => sum - f.balance, 0);
+  return { whoOwesMe, iOwe, myTotalBalance };
 }

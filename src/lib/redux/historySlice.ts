@@ -24,9 +24,9 @@ export const addGame = createAsyncThunk(
 export const settleBalance = createAsyncThunk(
   'history/settleBalance',
   async (settlementData: SettlementData, { getState }) => {
-    const { players } = (getState() as { players: { players: Player[] } })
+    const { entities } = (getState() as { players: { entities: Player[] } })
       .players;
-    const me = players.find((p) => p.isMe);
+    const me = entities.find((p) => p.isMe);
     if (!me) {
       throw new Error('Current user not found in players list');
     }

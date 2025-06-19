@@ -27,15 +27,9 @@ export async function POST(req: Request) {
   await db.read();
   db.data ||= { players: [], history: [] };
 
-  const { settledById, settledPlayerId, settledPlayerName, amount } =
-    await req.json();
+  const { settledPlayerId, settledPlayerName, amount } = await req.json();
 
-  if (
-    !settledById ||
-    !settledPlayerId ||
-    !settledPlayerName ||
-    amount === undefined
-  ) {
+  if (!settledPlayerId || !settledPlayerName || amount === undefined) {
     return new Response(
       JSON.stringify({ message: 'Missing required fields for settlement.' }),
       { status: 400, headers: { 'Content-Type': 'application/json' } }
@@ -46,7 +40,6 @@ export async function POST(req: Request) {
     const newSettlement: HistoryEntry = {
       id: uuidv4(),
       type: 'settlement',
-      settledById,
       settledPlayerId,
       settledPlayerName,
       amount,
