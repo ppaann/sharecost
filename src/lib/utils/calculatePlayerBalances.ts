@@ -8,20 +8,17 @@ import { Player, PlayerWithBalance, HistoryEntry } from '@/types';
  * @returns Array of players with updated balances.
  */
 export function calculatePlayerBalances(
-  friends: Player[],
+  players: Player[],
   history: HistoryEntry[],
   me: Player
 ): PlayerWithBalance[] {
-  const balances: { [key: string]: PlayerWithBalance } = friends.reduce(
-    (acc, friend) => {
-      acc[friend.id] = { ...friend, balance: 0 };
+  const balances: { [key: string]: PlayerWithBalance } = players.reduce(
+    (acc, player) => {
+      acc[player.id] = { ...player, balance: 0 };
       return acc;
     },
     {} as Record<string, PlayerWithBalance>
   );
-
-  // console.log('Calculating balances for players:', balances);
-  // console.log('Using history entries:', history);
 
   history.forEach((entry) => {
     if (entry.type === 'game' && entry.participants && entry.paidBy) {
@@ -31,9 +28,7 @@ export function calculatePlayerBalances(
       const numParticipants = entry.participants.length;
       if (numParticipants === 0) return;
       const share = cost / numParticipants;
-      console.log(balances, payerId);
 
-      balances[payerId].balance += cost - share;
       if (iPaid) {
         entry.participants.forEach((pId) => {
           if (pId !== me.id && balances[pId]) {
@@ -49,8 +44,6 @@ export function calculatePlayerBalances(
       }
     } else if (entry.type === 'settlement' && entry.settledPlayerId) {
       if (balances[entry.settledPlayerId]) {
-        const amount = balances[entry.settledPlayerId].balance;
-        balances[me.id].balance -= amount;
         balances[entry.settledPlayerId].balance = 0;
       }
     }

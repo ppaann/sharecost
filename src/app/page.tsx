@@ -49,28 +49,28 @@ export default function App() {
     dispatch(fetchHistory());
   }, [dispatch]);
 
-  const playerBalances = useMemo<PlayerWithBalance[]>(() => {
+  const friendBalances = useMemo<PlayerWithBalance[]>(() => {
     if (!me) return [];
 
     return calculatePlayerBalances(friends, history, me);
   }, [friends, history, me]);
 
   const { whoOwesMe, iOwe, myTotalBalance } = useMemo(() => {
-    const whoOwesMe = playerBalances.filter((f) => f.balance < -0.01); // Use threshold for float issues
-    const iOwe = playerBalances.filter((f) => f.balance > 0.01);
-    const myTotalBalance = playerBalances.reduce(
+    const whoOwesMe = friendBalances.filter((f) => f.balance < -0.01); // Use threshold for float issues
+    const iOwe = friendBalances.filter((f) => f.balance > 0.01);
+    const myTotalBalance = friendBalances.reduce(
       (sum, f) => sum - f.balance,
       0
     );
     return { whoOwesMe, iOwe, myTotalBalance };
-  }, [playerBalances]);
+  }, [friendBalances]);
 
   const handleSettleBalance = (playerId: string) => {
     confirmSettleModal.open({
       title: 'Settle Balance',
       message: `Are you sure you want to settle the balance ?`,
       onConfirm: () => {
-        settleBalance(playerBalances, playerId);
+        settleBalance(friendBalances, playerId);
         confirmSettleModal.close();
       },
     });

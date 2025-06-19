@@ -24,7 +24,7 @@ const useAddGameModal = () => {
   // form input
   const [participantIds, setParticipantIds] = useState<string[]>([]);
   const [payerId, setPayerId] = useState<string>('');
-  const [cost, setCost] = useState<number>(0);
+  const [cost, setCost] = useState<string>('');
 
   const toggleParticipant = (id: string) => {
     setParticipantIds((prev) =>
@@ -34,7 +34,7 @@ const useAddGameModal = () => {
 
   const onOpen = () => {
     setError(null);
-    setCost(0);
+    setCost('');
     setPayerId('');
     setParticipantIds([]);
     modal.onOpen();
@@ -47,7 +47,7 @@ const useAddGameModal = () => {
       );
       return;
     }
-    if (isNaN(cost) || cost <= 0) {
+    if (isNaN(Number(cost)) || Number(cost) <= 0) {
       setError('Invalid cost amount.');
       return;
     }
@@ -59,7 +59,7 @@ const useAddGameModal = () => {
 
     const gameData: GameData = {
       type: 'game',
-      cost,
+      cost: Number(cost),
       paidBy: { id: payerDetails.id, name: payerDetails.name },
       participants: participantIds,
       participantNames: participantIds.map(
@@ -70,7 +70,7 @@ const useAddGameModal = () => {
     dispatch(addGame(gameData))
       .unwrap()
       .then(() => {
-        setCost(0);
+        setCost('');
         setPayerId('');
         setParticipantIds([]);
         modal.onClose();
