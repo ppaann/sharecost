@@ -9,7 +9,7 @@ const PlayerCardList = ({
   onRequestSettle,
 }: {
   playerBalances: PlayerWithBalance[];
-  onRequestSettle: (playerId: string) => void;
+  onRequestSettle?: (playerId: string) => void;
 }) => {
   return (
     <div>
@@ -20,7 +20,7 @@ const PlayerCardList = ({
             <PlayerCard
               key={player.id}
               player={player}
-              onSettle={onRequestSettle}
+              onSettle={onRequestSettle || (() => {})}
               onDelete={() => {}}
             />
           ))}

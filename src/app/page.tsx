@@ -24,7 +24,6 @@ import { useSettleBalance } from '@/hooks';
 
 export default function App() {
   const dispatch = useAppDispatch();
-  const userId = '123'; // Example user ID
 
   const players = useAppSelector((state) => state.players.entities);
   const history = useAppSelector((state) => state.history.entries);
@@ -55,6 +54,16 @@ export default function App() {
 
     return calculatePlayerBalances(friends, history, me);
   }, [friends, history, me]);
+
+  const { whoOwesMe, iOwe, myTotalBalance } = useMemo(() => {
+    const whoOwesMe = playerBalances.filter((f) => f.balance < -0.01); // Use threshold for float issues
+    const iOwe = playerBalances.filter((f) => f.balance > 0.01);
+    const myTotalBalance = playerBalances.reduce(
+      (sum, f) => sum - f.balance,
+      0
+    );
+    return { whoOwesMe, iOwe, myTotalBalance };
+  }, [playerBalances]);
 
   const handleSettleBalance = (playerId: string) => {
     confirmSettleModal.open({
@@ -94,10 +103,11 @@ export default function App() {
           <BadmintonIcon className='text-blue-400 w-8 h-8' />
           <h1 className='text-2xl font-bold text-white'>ShuttleShare</h1>
         </div>
-        {userId && (
-          <span className='text-xs text-gray-500 font-mono hidden md:block'>
-            UserID: {userId}
-          </span>
+        {me && (
+          <div className='text-right pr-4'>
+            <div className='font-bold text-white'>{me.name}</div>
+            <div className='text-xs text-gray-400'>(Me)</div>
+          </div>
         )}
       </header>
 
@@ -111,23 +121,63 @@ export default function App() {
         <div className='w-full max-w-4xl mx-auto'>
           {activeTab === 'players' && (
             <div>
-              {players.length === 0 && playerLoading === 'succeeded' && (
-                <div className='text-center py-16 text-gray-500'>
-                  <Users className='mx-auto w-16 h-16 mb-4' />
-                  <h3 className='text-xl'>No Players Yet</h3>
-                  <p>
-                    Click the &ldquo;Add Player&rdquo; button below to get
-                    started!
-                  </p>
+              {/* My Summary Card */}
+              <div className='bg-gray-800 p-6 rounded-xl shadow-lg'>
+                <h2 className='text-lg font-semibold text-gray-400 mb-2'>
+                  My Summary
+                </h2>
+                <div className='flex items-baseline gap-2'>
+                  <span
+                    className={`text-4xl font-bold ${
+                      myTotalBalance > 0
+                        ? 'text-green-400'
+                        : myTotalBalance < 0
+                        ? 'text-red-400'
+                        : 'text-white'
+                    }`}
+                  >
+                    ${Math.abs(myTotalBalance).toFixed(2)}
+                  </span>
+                  <span className='text-gray-400'>
+                    {myTotalBalance > 0
+                      ? 'Owed to Me'
+                      : myTotalBalance < 0
+                      ? 'You Owe'
+                      : 'All Settled'}
+                  </span>
                 </div>
-              )}
-
-              <PlayerCardList
-                playerBalances={playerBalances}
-                onRequestSettle={handleSettleBalance}
-              />
+              </div>
+              {/* Lists of Debts */}
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                <div>
+                  <h3 className='text-xl font-bold mb-4'>Who Owes Me</h3>
+                  <div className='space-y-3'>
+                    <PlayerCardList playerBalances={whoOwesMe} />
+                    {whoOwesMe.length === 0 && (
+                      <p className='text-gray-500 text-sm'>
+                        No one owes you money.
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <h3 className='text-xl font-bold mb-4'>Who I Owe</h3>
+                  <div className='space-y-3'>
+                    <PlayerCardList
+                      playerBalances={iOwe}
+                      onRequestSettle={handleSettleBalance}
+                    />
+                    {iOwe.length === 0 && (
+                      <p className='text-gray-500 text-sm'>
+                        You don&rdquo;t owe anyone money.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
+
           {activeTab === 'history' && (
             <HistoryList history={history} onSelect={handleHistoryItemClick} />
           )}
@@ -149,7 +199,7 @@ export default function App() {
               onClick={() => addGameModal.onOpen()}
               className='bg-blue-600 hover:bg-blue-500 text-white font-bold p-4 rounded-full shadow-lg transition-transform transform hover:scale-105 flex items-center gap-2'
             >
-              <Plus size={20} />{' '}
+              <Plus size={20} />
               <span className='hidden sm:inline'>New Game</span>
             </button>
           </div>

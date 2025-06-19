@@ -31,6 +31,7 @@ export function calculatePlayerBalances(
       const numParticipants = entry.participants.length;
       if (numParticipants === 0) return;
       const share = cost / numParticipants;
+      console.log(balances, payerId);
 
       balances[payerId].balance += cost - share;
       if (iPaid) {
