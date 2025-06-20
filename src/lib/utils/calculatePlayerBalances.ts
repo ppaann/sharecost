@@ -25,20 +25,27 @@ export function calculatePlayerBalances(
       const cost = entry.cost || 0;
       const iPaid = entry.paidBy.id === me.id;
       const payerId = entry.paidBy.id;
-      const numParticipants = entry.participants.length;
+      const shares = entry.shares || {};
+      const sumOfShares = Object.values(shares).reduce(
+        (sum, share) => sum + share,
+        0
+      );
+      const numParticipants = Math.max(entry.participants.length, sumOfShares);
+
       if (numParticipants === 0) return;
+
       const share = cost / numParticipants;
 
       if (iPaid) {
         entry.participants.forEach((pId) => {
           if (pId !== me.id && balances[pId]) {
-            balances[pId].balance -= share;
+            balances[pId].balance -= share * (shares[pId] || 1);
           }
         });
       } else {
         entry.participants.forEach((pId) => {
           if (pId !== me.id && pId !== payerId) {
-            balances[pId].balance -= share;
+            balances[pId].balance -= share * (shares[pId] || 1);
           }
         });
       }

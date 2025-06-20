@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'react';
 import Modal from '../Modal';
+import { Player } from '@/types';
 
 type AddGameModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onAdd: () => void;
-  players: { id: string; name: string }[];
+  players: Player[];
   cost: string;
   setCost: (cost: string) => void;
   payerId: string;
@@ -15,6 +16,8 @@ type AddGameModalProps = {
   newPlayerName: string;
   setNewPlayerName: (name: string) => void;
   handleAddNewPlayer: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  shares: { [playerId: string]: number };
+  handleShareChange: (playerId: string, share: number) => void;
   error?: string | null;
 };
 
@@ -32,6 +35,8 @@ const AddGameModal = ({
   newPlayerName,
   setNewPlayerName,
   handleAddNewPlayer,
+  shares,
+  handleShareChange,
   error,
 }: AddGameModalProps) => {
   const costInputRef = useRef<HTMLInputElement>(null);
@@ -82,7 +87,7 @@ const AddGameModal = ({
             <option value=''>Select a player</option>
             {players.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.name}
+                {p.name} {p.isMe ? '(Me)' : ''}
               </option>
             ))}
           </select>
@@ -102,7 +107,9 @@ const AddGameModal = ({
                     : 'bg-gray-700/50 hover:bg-gray-700'
                 }`}
               >
-                <span className='font-medium'>{p.name}</span>
+                <span className='font-medium'>
+                  {p.name} {p.isMe ? '(Me)' : ''}
+                </span>
                 <div
                   className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${
                     participants.includes(p.id)
@@ -128,6 +135,49 @@ const AddGameModal = ({
             </div>
           </div>
         </div>
+        {participants.length > 0 && (
+          <div>
+            <label className='block text-sm font-medium text-gray-400 mb-2'>
+              Manage Shares
+            </label>
+            <div className='space-y-2 p-3 bg-gray-900/70 rounded-md'>
+              {players
+                .filter((p) => participants.includes(p.id))
+                .map((p) => (
+                  <div key={p.id} className='flex items-center justify-between'>
+                    <span className='font-medium text-white'>
+                      {p.name}
+                      {p.isMe ? ' (Me)' : ''}
+                    </span>
+                    <div className='flex items-center gap-2'>
+                      <button
+                        onClick={() =>
+                          handleShareChange(p.id, (shares[p.id] || 1) - 1)
+                        }
+                        className='bg-gray-600 w-7 h-7 rounded-full text-lg'
+                      >
+                        -
+                      </button>
+                      <input
+                        type='number'
+                        value={shares[p.id] || 1}
+                        readOnly
+                        className='w-12 text-center bg-gray-700 rounded-md p-1'
+                      />
+                      <button
+                        onClick={() =>
+                          handleShareChange(p.id, (shares[p.id] || 1) + 1)
+                        }
+                        className='bg-gray-600 w-7 h-7 rounded-full text-lg'
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
       </div>
       <button
         onClick={onAdd}

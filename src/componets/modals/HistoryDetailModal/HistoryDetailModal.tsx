@@ -11,9 +11,19 @@ const HistoryDetailModal = ({
   item: HistoryEntry | null;
 }) => {
   if (!item) return null;
+  const sumOfShare = item.shares
+    ? Object.values(item.shares).reduce((sum, s) => sum + s, 0)
+    : 0;
+  const totalParticipants = Math.max(
+    sumOfShare,
+    item.participants?.length || 0
+  );
   const share =
-    item.type === 'game' && item.cost && item.participants?.length
-      ? (item.cost / item.participants.length).toFixed(2)
+    item.type === 'game' &&
+    item.cost &&
+    item.participants &&
+    item.participants.length > 0
+      ? (item.cost / totalParticipants).toFixed(2)
       : '0.00';
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -46,13 +56,18 @@ const HistoryDetailModal = ({
         )}
         {item.type === 'game' && (item.participants?.length ?? 0) > 0 && (
           <div>
-            <strong>Participants ({item.participants?.length ?? 0}):</strong>
+            <strong>Participants ({totalParticipants ?? 0}):</strong>
             <ul className='list-disc list-inside mt-2 bg-gray-900/50 p-3 rounded-md'>
-              {Array.isArray(item.participantNames) &&
-                item.participantNames.length > 0 &&
-                item.participantNames.map((name, index) => (
-                  <li key={index}>{name}</li>
-                ))}
+              {item.participants?.map((id, index) => (
+                <li key={id}>
+                  {(Array.isArray(item.participantNames) &&
+                    item.participantNames[index]) ||
+                    'Unknown'}
+                  {item.shares && item.shares[id] > 1
+                    ? ` (covers ${item.shares[id]})`
+                    : ''}
+                </li>
+              ))}
             </ul>
             <p className='text-sm text-gray-500 mt-2'>
               Share per player: ${share}

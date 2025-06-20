@@ -13,6 +13,7 @@ export interface GameData {
   paidBy: { id: string; name: string };
   participants: string[];
   participantNames: string[];
+  shares?: { [playerId: string]: number }; // Optional shares for each player
 }
 
 // For settling up

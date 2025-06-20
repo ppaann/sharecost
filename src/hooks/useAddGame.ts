@@ -10,6 +10,7 @@ const useAddGame = () => {
     cost: string,
     payerId: string,
     participantIds: string[],
+    shares: { [playerId: string]: number },
     setError: (error: string | null) => void
   ) => {
     if (!cost || !payerId || participantIds.length === 0) {
@@ -36,6 +37,7 @@ const useAddGame = () => {
       participantNames: participantIds.map(
         (id) => players.find((p) => p.id === id)?.name || 'Unknown'
       ),
+      shares: shares || {},
     };
 
     try {

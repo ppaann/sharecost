@@ -13,6 +13,9 @@ type ControllerProps = {
   participants: string[];
   toggleParticipant: (participantId: string) => void;
   handleAddGame: () => void;
+
+  shares?: { [playerId: string]: number };
+  handleShareChange?: (playerId: string, share: number) => void;
   error: string | null;
 };
 const useAddGameModal = () => {
@@ -22,6 +25,7 @@ const useAddGameModal = () => {
   const me = players.find((p) => p.isMe);
   const [newPlayerName, setNewPlayerName] = useState<string>('');
   const { addPlayerHandler } = useAddPlayer();
+  const [shares, setShares] = useState<{ [playerId: string]: number }>({});
 
   const { addGameHandler } = useAddGame();
 
@@ -34,6 +38,10 @@ const useAddGameModal = () => {
     setParticipantIds((prev) =>
       prev.includes(id) ? prev.filter((pId) => pId !== id) : [...prev, id]
     );
+    setShares((prev) => ({
+      ...prev,
+      [id]: prev[id] || 1, // Add share for new participants with default value of 1
+    }));
   };
 
   const onOpen = () => {
@@ -41,17 +49,22 @@ const useAddGameModal = () => {
     setCost('');
     setPayerId(me?.id || '');
     setParticipantIds([]);
+    setShares({});
+    setNewPlayerName('');
     modal.onOpen();
   };
 
   const handleAddGame = async () => {
-    await addGameHandler(cost, payerId, participantIds, setError);
+    await addGameHandler(cost, payerId, participantIds, shares, setError);
     // If no error was set, consider it successful
     if (!error) {
       modal.onClose();
       setCost('');
       setPayerId(me?.id || '');
       setParticipantIds([]);
+      setShares({});
+      setNewPlayerName('');
+      setError(null);
     }
   };
   const handleAddNewPlayer = async (
@@ -60,6 +73,13 @@ const useAddGameModal = () => {
     if (e.key === 'Enter' && newPlayerName.trim()) {
       await addPlayerHandler(newPlayerName);
     }
+  };
+
+  const handleShareChange = (playerId: string, share: number) => {
+    setShares((prev) => ({
+      ...prev,
+      [playerId]: Math.max(0, share), // Ensure share is non-negative
+    }));
   };
 
   return {
@@ -77,6 +97,8 @@ const useAddGameModal = () => {
     newPlayerName,
     setNewPlayerName,
     handleAddNewPlayer,
+    shares,
+    handleShareChange,
     error: error,
   };
 };
