@@ -185,13 +185,6 @@ export default function App() {
           <TabNavi activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className='flex items-center gap-2'>
             <button
-              onClick={() => addPlayerModel.onOpen()}
-              className='bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-4 rounded-full shadow-lg transition-transform transform hover:scale-105 flex items-center gap-2'
-            >
-              <Users size={20} />
-              <span className='hidden sm:inline'>Add Player</span>
-            </button>
-            <button
               onClick={() => addGameModal.onOpen()}
               className='bg-blue-600 hover:bg-blue-500 text-white font-bold p-4 rounded-full shadow-lg transition-transform transform hover:scale-105 flex items-center gap-2'
             >
