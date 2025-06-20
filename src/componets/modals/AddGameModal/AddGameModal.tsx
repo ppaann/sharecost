@@ -12,6 +12,9 @@ type AddGameModalProps = {
   setPayerId: (payerId: string) => void;
   participants: string[];
   toggleParticipant: (playerId: string) => void;
+  newPlayerName: string;
+  setNewPlayerName: (name: string) => void;
+  handleAddNewPlayer: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   error?: string | null;
 };
 
@@ -26,6 +29,9 @@ const AddGameModal = ({
   setPayerId,
   participants,
   toggleParticipant,
+  newPlayerName,
+  setNewPlayerName,
+  handleAddNewPlayer,
   error,
 }: AddGameModalProps) => {
   const costInputRef = useRef<HTMLInputElement>(null);
@@ -110,6 +116,16 @@ const AddGameModal = ({
                 </div>
               </div>
             ))}
+            <div>
+              <input
+                type='text'
+                value={newPlayerName}
+                onChange={(e) => setNewPlayerName(e.target.value)}
+                placeholder='Add new player'
+                onKeyDown={handleAddNewPlayer}
+                className='w-full bg-gray-600 border-gray-500 rounded-lg p-3 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none'
+              />
+            </div>
           </div>
         </div>
       </div>

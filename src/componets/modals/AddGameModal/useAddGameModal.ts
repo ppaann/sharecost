@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Player, GameData } from '@/types';
-import { useAppDispatch, useAppSelector } from '@/lib/redux/store';
-import { addGame } from '@/lib/redux/historySlice';
+import { Player } from '@/types';
+import { useAppSelector } from '@/lib/redux/store';
 import useModal from '../useModal';
+import { useAddGame, useAddPlayer } from '@/hooks';
 
 type ControllerProps = {
   players: Player[];
@@ -16,11 +16,14 @@ type ControllerProps = {
   error: string | null;
 };
 const useAddGameModal = () => {
-  const dispatch = useAppDispatch();
   const modal = useModal<ControllerProps>();
   const players = useAppSelector((state) => state.players.entities);
   const [error, setError] = useState<string | null>(null);
   const me = players.find((p) => p.isMe);
+  const [newPlayerName, setNewPlayerName] = useState<string>('');
+  const { addPlayerHandler } = useAddPlayer();
+
+  const { addGameHandler } = useAddGame();
 
   // form input
   const [participantIds, setParticipantIds] = useState<string[]>([]);
@@ -42,42 +45,21 @@ const useAddGameModal = () => {
   };
 
   const handleAddGame = async () => {
-    if (!cost || !payerId || participantIds.length === 0) {
-      setError(
-        'Please fill all fields: cost, payer, and at least one participant.'
-      );
-      return;
+    await addGameHandler(cost, payerId, participantIds, setError);
+    // If no error was set, consider it successful
+    if (!error) {
+      modal.onClose();
+      setCost('');
+      setPayerId(me?.id || '');
+      setParticipantIds([]);
     }
-    if (isNaN(Number(cost)) || Number(cost) <= 0) {
-      setError('Invalid cost amount.');
-      return;
+  };
+  const handleAddNewPlayer = async (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === 'Enter' && newPlayerName.trim()) {
+      await addPlayerHandler(newPlayerName);
     }
-    const payerDetails = players.find((p) => p.id === payerId);
-    if (!payerDetails) {
-      setError('Payer not found.');
-      return;
-    }
-
-    const gameData: GameData = {
-      type: 'game',
-      cost: Number(cost),
-      paidBy: { id: payerDetails.id, name: payerDetails.name },
-      participants: participantIds,
-      participantNames: participantIds.map(
-        (id) => players.find((p) => p.id === id)?.name || 'Unknown'
-      ),
-    };
-
-    dispatch(addGame(gameData))
-      .unwrap()
-      .then(() => {
-        setCost('');
-        setPayerId('');
-        setParticipantIds([]);
-        modal.onClose();
-        setError('');
-      })
-      .catch((err) => setError(err.message));
   };
 
   return {
@@ -92,6 +74,9 @@ const useAddGameModal = () => {
     participants: participantIds,
     toggleParticipant,
     handleAddGame,
+    newPlayerName,
+    setNewPlayerName,
+    handleAddNewPlayer,
     error: error,
   };
 };

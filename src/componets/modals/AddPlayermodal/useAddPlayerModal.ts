@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/lib/redux/store';
-import { addPlayer } from '@/lib/redux/playersSlice';
 import useModal from '../useModal';
+import { useAddPlayer } from '@/hooks';
 
 type ControllerProps = {
   isOpen: boolean;
@@ -13,10 +12,7 @@ type ControllerProps = {
 };
 
 const useAddPlayerModal = (): ControllerProps => {
-  const dispatch = useAppDispatch();
-  const players = useAppSelector((state) => state.players.entities);
-  const loading = useAppSelector((state) => state.players.loading);
-
+  const { addPlayerHandler } = useAddPlayer();
   const modal = useModal();
 
   const [name, setName] = useState('');
@@ -26,30 +22,9 @@ const useAddPlayerModal = (): ControllerProps => {
     setName('');
   };
 
-  const onAdd = () => {
-    if (!name.trim()) {
-      alert('Player name cannot be empty');
-      return;
-    }
-    if (
-      players.some((player) => player.name.toLowerCase() === name.toLowerCase())
-    ) {
-      alert('Player already exists');
-      return;
-    }
-    if (loading === 'pending') {
-      alert('Please wait, another operation is in progress');
-      return;
-    }
-    dispatch(addPlayer(name.trim()))
-      .unwrap()
-      .then(() => {
-        onClose();
-      })
-      .catch((error) => {
-        console.error('Failed to add player:', error);
-        alert('Failed to add player. Please try again.');
-      });
+  const onAdd = async () => {
+    await addPlayerHandler(name);
+    onClose();
   };
 
   return {
