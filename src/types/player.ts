@@ -9,7 +9,7 @@ export interface PlayerWithBalance extends Player {
 }
 
 export interface User extends Player {
-  email: string;
-  image: string;
+  email?: string;
+  image?: string;
   displayName: string;
 }

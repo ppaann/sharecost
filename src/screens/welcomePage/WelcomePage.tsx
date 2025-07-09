@@ -1,7 +1,7 @@
 import useWelcomePage from './useWelcomePage';
 
 const WelcomePage = () => {
-  const { onContinueOffline, onSignIn } = useWelcomePage();
+  const { onContinueLocal, onSignIn } = useWelcomePage();
   return (
     <div className='flex flex-col items-center justify-center h-screen bg-gray-900 text-white text-center p-8'>
       <h1 className='text-5xl font-bold mb-4'>Welcome to ShuttleShare!</h1>
@@ -17,10 +17,10 @@ const WelcomePage = () => {
           Sign In to Sync Data
         </button>
         <button
-          onClick={onContinueOffline}
+          onClick={onContinueLocal}
           className='w-full sm:w-auto bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 px-8 rounded-lg text-lg transition-transform transform hover:scale-105'
         >
-          Continue Offline
+          Continue Local Only
         </button>
       </div>
       <p className='text-sm text-gray-500 mt-8'>

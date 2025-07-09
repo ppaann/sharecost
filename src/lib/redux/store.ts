@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import playersReducer from './playersSlice';
 import historyReducer from './historySlice';
+import appModeReducer from './appModeSlice';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
 export const store = configureStore({
   reducer: {
     players: playersReducer,
     history: historyReducer,
+    appMode: appModeReducer,
   },
 });
 

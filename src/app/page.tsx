@@ -16,14 +16,16 @@ import {
 import { useAppDispatch, useAppSelector } from '@/lib/redux/store';
 import { fetchPlayers } from '@/lib/redux/playersSlice';
 import { fetchHistory } from '@/lib/redux/historySlice';
-import { BadmintonIcon } from '@/componets/icons';
-import { Users, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { HistoryEntry, PlayerWithBalance } from '@/types';
 import {
   calculatePlayerBalances,
   calculateMyBalances,
 } from '@/lib/utils/calculatePlayerBalances';
 import { useSettleBalance } from '@/hooks';
+import { Header } from '@/componets';
+import { useAppMode } from '@/hooks/useAppMode';
+import WelcomePage from '@/screens/welcomePage/WelcomePage';
 
 export default function App() {
   const dispatch = useAppDispatch();
@@ -31,6 +33,7 @@ export default function App() {
   const players = useAppSelector((state) => state.players.entities);
   const history = useAppSelector((state) => state.history.entries);
   const playerLoading = useAppSelector((state) => state.players.loading);
+  const appMode = useAppSelector((state) => state.appMode.mode);
 
   const me = useMemo(() => players.find((p) => p.isMe), [players]);
   const friends = useMemo(() => players.filter((p) => !p.isMe), [players]);
@@ -60,6 +63,11 @@ export default function App() {
   const { whoOwesMe, iOwe, myTotalBalance } = useMemo(() => {
     return calculateMyBalances(friendBalances);
   }, [friendBalances]);
+
+  if (appMode === 'onboarding') {
+    // Redirect to onboarding page if appMode is 'onboarding'
+    return <WelcomePage />;
+  }
 
   const handleSettleBalance = (playerId: string) => {
     confirmSettleModal.open({
@@ -94,18 +102,12 @@ export default function App() {
   }
   return (
     <div className='bg-gray-900 text-white min-h-screen font-sans flex flex-col'>
-      <header className='bg-gray-900/80 backdrop-blur-sm sticky top-0 z-20 p-4 border-b border-gray-700 shadow-lg flex justify-between items-center'>
-        <div className='flex items-center gap-3'>
-          <BadmintonIcon className='text-blue-400 w-8 h-8' />
-          <h1 className='text-2xl font-bold text-white'>ShuttleShare</h1>
-        </div>
-        {me && (
-          <div className='text-right pr-4'>
-            <div className='font-bold text-white'>{me.name}</div>
-            <div className='text-xs text-gray-400'>(Me)</div>
-          </div>
-        )}
-      </header>
+      <Header
+        appMode={appMode}
+        user={{ id: '123', name: 'abc', isMe: true, displayName: 'abc' }} // Pass the current user (me) to the Header
+        onSignIn={() => {}}
+        onSignOut={() => {}}
+      />
 
       <main className='flex-grow p-4 md:p-6'>
         {/* {error && (
