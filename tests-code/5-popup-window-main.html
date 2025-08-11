@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <meta charset="utf-8" />
+  <title>Popup Demo Help Doc</title>
+
+  <body>
+    <h1>Popup Window Handling Demo</h1>
+
+    <button id="openHelp" type="button" data-testid="open-help-btn">
+      Open popup
+    </button>
+
+    <button
+      id="'message"
+      type="button"
+      data-testid="open-message"
+      style="margin-left: 8px"
+      onclick="alert('This is a popup alert message!');"
+    >
+      Message
+    </button>
+
+    <!-- Fallback link (useful if popups are blocked) -->
+    <p>
+      <a
+        id="openHelpLink"
+        href="5-popup-window-pop.html"
+        target="_blank"
+        rel="noopener"
+        data-testid="open-help-link"
+      >
+        Open Help (fallback link)
+      </a>
+    </p>
+
+    <div
+      id="status"
+      role="status"
+      aria-live="polite"
+      style="margin-top: 8px"
+    ></div>
+
+    <script>
+      const btn = document.getElementById('openHelp');
+      const status = document.getElementById('status');
+
+      btn.addEventListener('click', () => {
+        // Open help in a new tab. 'noopener,noreferrer' for security.
+        const win = window.open(
+          '5-popup-window-pop.html',
+          '_blank',
+          'noopener,noreferrer'
+        );
+        if (win) {
+          status.textContent = 'Popup opened in a new tab.';
+        } else {
+          status.textContent = 'Popup blocked. Use the fallback link.';
+        }
+      });
+    </script>
+  </body>
+</html>

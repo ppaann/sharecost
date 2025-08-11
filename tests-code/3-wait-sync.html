@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <meta charset="utf-8" />
+  <title>Mini Save Widget</title>
+
+  <body>
+    <label for="note">Note</label>
+    <input id="note" type="text" placeholder="Type something…" />
+
+    <button id="saveBtn" type="button">Save</button>
+    <!-- Optional status announcement for screen readers -->
+    <div id="status" role="status" aria-live="polite"></div>
+
+    <script>
+      const saveBtn = document.getElementById('saveBtn');
+      const status = document.getElementById('status');
+
+      saveBtn.addEventListener('click', async () => {
+        // Prevent double-clicks while saving
+        saveBtn.disabled = true;
+        saveBtn.setAttribute('aria-busy', 'true');
+        saveBtn.textContent = 'Saving...';
+        status.textContent = 'Saving...';
+
+        // Simulate async save
+        await new Promise((r) => setTimeout(r, 2000));
+
+        // Update UI after "save" completes
+        saveBtn.textContent = 'Saved';
+        saveBtn.removeAttribute('aria-busy');
+        status.textContent = 'Saved';
+        saveBtn.disabled = false;
+      });
+    </script>
+  </body>
+</html>

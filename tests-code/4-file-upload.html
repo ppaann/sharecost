@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <meta charset="utf-8" />
+  <title>PDF Upload & Verify</title>
+
+  <body>
+    <form id="uploadForm">
+      <label for="fileInput">Upload a PDF</label>
+      <input
+        id="fileInput"
+        name="attachment"
+        type="file"
+        accept="application/pdf,.pdf"
+        aria-describedby="fileHelp"
+        data-testid="file-input"
+      />
+      <div id="fileHelp">Only .pdf files are accepted.</div>
+
+      <div
+        id="error"
+        role="alert"
+        aria-live="assertive"
+        style="color: #b00; margin-top: 8px"
+      ></div>
+
+      <section aria-labelledby="attachmentsHeading" style="margin-top: 16px">
+        <h2 id="attachmentsHeading">Attachments</h2>
+        <ul
+          id="attachmentList"
+          role="list"
+          data-testid="attachment-list"
+          style="padding-left: 18px"
+        ></ul>
+      </section>
+    </form>
+
+    <script>
+      const fileInput = document.getElementById('fileInput');
+      const list = document.getElementById('attachmentList');
+      const error = document.getElementById('error');
+
+      let objectURL = null; // track blob URL to revoke later
+
+      function formatBytes(bytes) {
+        if (!Number.isFinite(bytes)) return '';
+        const units = ['B', 'KB', 'MB', 'GB'];
+        let i = 0,
+          val = bytes;
+        while (val >= 1024 && i < units.length - 1) {
+          val /= 1024;
+          i++;
+        }
+        return `${val.toFixed(val >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
+      }
+
+      function clearList() {
+        list.innerHTML = '';
+        if (objectURL) URL.revokeObjectURL(objectURL);
+        objectURL = null;
+      }
+
+      function isPDF(file) {
+        if (!file) return false;
+        const hasPdfMime = file.type === 'application/pdf';
+        const hasPdfExt = /\.pdf$/i.test(file.name || '');
+        // accept if MIME says pdf OR (browser didn’t set type but extension is .pdf)
+        return hasPdfMime || (!file.type && hasPdfExt);
+      }
+
+      fileInput.addEventListener('change', () => {
+        error.textContent = '';
+        clearList();
+
+        const file = fileInput.files?.[0];
+        if (!file) return;
+
+        if (!isPDF(file)) {
+          error.textContent = 'Please upload a PDF file.';
+          fileInput.value = '';
+          return;
+        }
+
+        objectURL = URL.createObjectURL(file);
+
+        const li = document.createElement('li');
+        li.setAttribute('role', 'listitem');
+        li.setAttribute('data-testid', 'attachment-item');
+
+        // Name
+        const name = document.createElement('span');
+        name.textContent = file.name;
+        name.setAttribute('data-testid', 'attachment-name');
+        name.style.fontWeight = '600';
+
+        // Size
+        const size = document.createElement('span');
+        size.textContent = ` (${formatBytes(file.size)})`;
+        size.style.color = '#555';
+
+        // Preview (optional)
+        const preview = document.createElement('a');
+        preview.href = objectURL;
+        preview.target = '_blank';
+        preview.rel = 'noopener';
+        preview.textContent = ' Preview';
+        preview.setAttribute('data-testid', 'attachment-preview');
+
+        // Remove
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.textContent = 'Remove';
+        removeBtn.setAttribute('data-testid', 'attachment-remove');
+        removeBtn.style.marginLeft = '8px';
+        removeBtn.addEventListener('click', () => {
+          clearList();
+          fileInput.value = '';
+        });
+
+        li.appendChild(name);
+        li.appendChild(size);
+        li.appendChild(preview);
+        li.appendChild(removeBtn);
+        list.appendChild(li);
+      });
+    </script>
+  </body>
+</html>
